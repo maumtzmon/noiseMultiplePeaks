@@ -66,7 +66,7 @@ double multGaussians(double *x, double *par){
 //--------VARIABLES TO FIT HISTOGRAMS--------
                     //41 para probar solo con el pico 40y 41
 //const int numpeaks = 740;		// Number of peaks to fit starting from the 0e peak (numpeaks=2 fits the 0e and the 1e peak)
-const int numpeaks = 800;
+const int numpeaks = 756;
 double xPeak[numpeaks-1], exPeak[numpeaks-1]; 
 const int numext = 16;		// Number of working extensions
 double gainPeak[numext][numpeaks-1]; // ganancia medida entre picos  gainPeak[0] = peak2mean - peak1mean
@@ -92,6 +92,8 @@ int peakLimit_2=200;
 int doFit=0; // 1 do fit, 0 doesn't
 
 
+int next_ini = 5;
+int next_end = 6;
 
 void noisedcmm_3peaks_combined (char const* file, char const* file2){
   // File to save output
@@ -130,7 +132,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   TFile filehist(Form("%s", file));
 
   TH1F *hpix[numext];
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
 
 	hpix[next] = (TH1F*)filehist.Get(Form("ext%i", goodext[next]));
 	hpix[next]->SetDirectory(0);
@@ -174,7 +176,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
 
   // ---------------------------------------------
   // Data Extraction, iteracion por cada extension
-  for (int next=5; next<6; next++){			// Loop of exts
+  for (int next=next_ini; next<next_end; next++){			// Loop of exts
 
     //histogram labels
   hpix[next]->SetTitle(Form("ext%i", goodext[next]+1));
@@ -335,7 +337,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
           gainfit=240;
           const1=40;
           hiq=loq+gainfit+3.2*abs(sigma1);
-          loq=loq-0.7*abs(sigma1);
+          loq=loq-0.5*abs(sigma1);
           printf("\n\n initial parameters for 2 gaussians in Peak %i \n loq = %i, hiq = %i, mean = %f, sigma= %f, \n initial gain= %f, initial const= %f \n increments= %i \n", npeak, loq, hiq, mean1, sigma1, gainfit,const1, numGaussians);
 
         }
@@ -346,7 +348,13 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
 
         fitfun[npeak]->SetParameter(0,norm0);        //norm
         fitfun[npeak]->SetParameter(1,mean1);    //mu
-        fitfun[npeak]->SetParameter(2,sigma1);       //Sigma
+        if (abs(sigma1)>80){
+          sigma1=50;
+          fitfun[npeak]->SetParameter(2,sigma1);       //Sigma
+        }
+        else{
+          fitfun[npeak]->SetParameter(2,abs(sigma1));       //Sigma
+        }
         fitfun[npeak]->SetParameter(3,gainfit);      //gain
         fitfun[npeak]->SetParameter(4,const1);        //con, fondo en el que estan montados las gaussianas
 
@@ -366,12 +374,18 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
           
         if (abs(sigma1)>100){
           sigma1=60;
+          if (gainfit>250){
+            gainfit=235;
+          }
           mean1=mean1+2*gainfit;
           loq=mean1-0.4*gainfit;
           
           hiq=mean1+gainfit+0.4*gainfit;
         }
         else{
+          if (gainfit>250){
+            gainfit=235;
+          }
           mean1=mean1+2*gainfit;
           loq=mean1-0.4*gainfit;
           
@@ -380,6 +394,8 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
           // mean1=mean1+250;
           // hiq=loq+gainfit+3.2*abs(sigma1);
         }
+
+        
 
         //guardar ganancia y errores cuando se calcula en cada pico
         gainPeak[next][npeak]=fitfun[npeak]->GetParameter(3);
@@ -418,7 +434,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
         if (npeak==peakLimit_2+1){
             numGaussians+=1;
             gainfit=240;
-            const1=5;
+            const1=2;
             hiq=loq+3*gainfit;//+3.2*abs(sigma1);
             loq=loq-0.7*abs(sigma1);
             //printf("\n\n initial parameters for %i gaussians in Peak %i \n loq = %i, hiq = %f, mean = %f, sigma= %f, \n initial gain= %f, initial const= %f \n\n", numGaussians, loq, hiq, mean1, sigma1, gainfit,const1);
@@ -453,6 +469,9 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
           
         if (gainfit<200){
           gainfit=230;
+        }
+        if (gainfit>250){
+          gainfit=235;
         }
 
         if (abs(sigma1)>100){
@@ -535,7 +554,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   int n=numpeaks-iniPeak;
   printf("\n\n numpeaks= %i; iniPeak= %i;xpeak len= %f, n puntos=%i \n\n", numpeaks, iniPeak, sizeXpeak, n);
 
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
 
     egraph[next] = new TGraphErrors(n, xPeak, gainPeak[next],exPeak, egainPeak[next] ); // Grafica de cada extension
     egraph[next]->SetTitle(Form("ext%i",goodext[next]+1));
@@ -564,7 +583,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   TCanvas *c2 = new TCanvas("c2","chisquare/ndf", 2000, 500);
   TGraph *pValGraph[numext];  
 
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
 
     pValGraph[next] = new TGraph(n, xPeak, cociente); // Draw  cociente[npeak]=chisquare/ndf;
     pValGraph[next]->SetTitle(Form("ext%i",goodext[next]+1));
@@ -583,7 +602,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   printf("\nmean behavior across the peaks\n");
   //TGraphErrors *egraph[numext];
   TCanvas *c3 = new TCanvas("c3","Draw mean Behavior", 2000, 500);//*ceil(numext/4.)); //propiedades del canvas
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
     float sizeXpeak=sizeof(xPeak);
   
  
@@ -600,7 +619,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   
   printf("\n\n numpeaks= %i; iniPeak= %i;xpeak len= %f, n puntos=%i \n\n", numpeaks, iniPeak, sizeXpeak, n);
 
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
 
     egraph[next] = new TGraphErrors(n, xPeak, gainDiv[next],exPeak, egainDiv[next] ); // Grafica de cada extension
     egraph[next]->SetTitle(Form("ext%i",goodext[next]+1));
@@ -633,7 +652,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   
   printf("\n\n numpeaks= %i; iniPeak= %i;xpeak len= %f, n puntos=%i \n\n", numpeaks, iniPeak, sizeXpeak, n);
 
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
 
     egraph[next] = new TGraphErrors(n, xPeak, peakGain[next],exPeak, 0 ); // Grafica de cada extension
     egraph[next]->SetTitle(Form("ext%i",goodext[next]+1));
@@ -665,7 +684,7 @@ void noisedcmm_3peaks_combined (char const* file, char const* file2){
   
   printf("\n\n numpeaks= %i; iniPeak= %i;xpeak len= %f, n puntos=%i \n\n", numpeaks, iniPeak, sizeXpeak, n);
 
-  for (int next=5; next<6; next++){
+  for (int next=next_ini; next<next_end; next++){
 
     egraph[next] = new TGraphErrors(n, xPeak, peakGainDiv[next],exPeak, 0 ); // Grafica de cada extension
     egraph[next]->SetTitle(Form("ext%i",goodext[next]+1));

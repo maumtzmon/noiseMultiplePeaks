@@ -1,0 +1,15 @@
+Hello
+
+This is the command line to run the both examples noisedcmm_3peaks_combined.C and noisedcmm_3peaks_allChips.C
+
+We have two data files: a ROOT file, with the histograms; and the tsv file with estimated parameters.
+
+To run file using Cern ROOT you can run first and then in ROOT prompt type
+
+	root [0] .x noisedcmm_3peaks_combined.C("MCM18_J8__all_hepeaks.root","MCM18_J_gain_parameters.root")
+
+or
+
+	root [0] .x noisedcmm_3peaks_allChips.C("MCM18_J8__all_hepeaks.root","MCM18_J_gain_parameters.root")
+
+After the code runs you can find the PDFs files in outputs/ directory.

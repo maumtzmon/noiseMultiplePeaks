@@ -66,7 +66,7 @@ double multGaussians(double *x, double *par){
 //--------VARIABLES TO FIT HISTOGRAMS--------
                     //41 para probar solo con el pico 40y 41
 //const int numpeaks = 740;		// Number of peaks to fit starting from the 0e peak (numpeaks=2 fits the 0e and the 1e peak)
-const int numpeaks = 800;
+const int numpeaks = 756;
 double xPeak[numpeaks-1], exPeak[numpeaks-1]; 
 const int numext = 16;		// Number of working extensions
 double gainPeak[numext][numpeaks-1]; // ganancia medida entre picos  gainPeak[0] = peak2mean - peak1mean
@@ -135,8 +135,8 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
   TH1F *hpix[numext];
   for (int next=0; next<16; next++){
 
-	hpix[next] = (TH1F*)filehist.Get(Form("ext%i", goodext[next]));
-	hpix[next]->SetDirectory(0);
+    hpix[next] = (TH1F*)filehist.Get(Form("ext%i", goodext[next]));
+    hpix[next]->SetDirectory(0);
     hpix[next]->SetAxisRange(0.0,5.0);
 
   }
@@ -375,17 +375,23 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
             fitfun[npeak]->GetParameters(&pars[npeak*5]);
             
             if (abs(sigma1)>100){
-            sigma1=60;
-            mean1=mean1+2*gainfit;
-            loq=mean1-0.4*gainfit;
+              sigma1=60;
+              if (gainfit>250){
+                gainfit=235;
+              }
+              mean1=mean1+2*gainfit;
+              loq=mean1-0.4*gainfit;
             
-            hiq=mean1+gainfit+0.4*gainfit;
+              hiq=mean1+gainfit+0.4*gainfit;
             }
             else{
-            mean1=mean1+2*gainfit;
-            loq=mean1-0.4*gainfit;
+              if (gainfit>250){
+                gainfit=235;
+              }
+              mean1=mean1+2*gainfit;
+              loq=mean1-0.4*gainfit;
             
-            hiq=mean1+gainfit+0.4*gainfit;
+              hiq=mean1+gainfit+0.4*gainfit;
             // loq=mean1+250-1.5*abs(sigma1);
             // mean1=mean1+250;
             // hiq=loq+gainfit+3.2*abs(sigma1);
@@ -536,7 +542,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
     hpix[next]->Draw();
 
   }    
-  c0->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/Distribution_noisedc.pdf")); //, fileroot));
+  c0->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/Distribution_noisedc.pdf")); //, fileroot));
 
   // ---------------------------------------------
   // Plot Section
@@ -580,8 +586,8 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
   printf("\n\n numpeaks= %i; iniPeak= %i;xpeak len= %f, n puntos=%i \n\n", numpeaks, iniPeak, sizeXpeak, n);
 
   for (int next=next_ini; next<next_end; next++){
-	ctr = ctr+1;
-	c1->cd(ctr);
+    ctr = ctr+1;
+    c1->cd(ctr);
     egraph[next] = new TGraphErrors(n, xPeak, gainPeak[next],exPeak, egainPeak[next] ); // Grafica de cada extension
     egraph[next]->SetTitle(Form("ext%i",goodext[next]));
     egraph[next]->SetMinimum(210);
@@ -603,22 +609,22 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
    
 
   }
-  c1->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/Gain_noisedc.pf"));
+  c1->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/Gain_noisedc.pf"));
 
   // ---------------------------------------------
   //plot Chisquare/ndf
-  TCanvas *c2 = new TCanvas("c2","chisquare/ndf c2", 2000, 500);
+  TCanvas *c2 = new TCanvas("c2","chisquare/ndf c2", 2000, 500*ceil(numext/4.));
   TGraph *pValGraph[numext];  
   c2->Divide(ceil(numext/COLNUM), ROWNUM);
   ctr = 0;
 
   for (int next=next_ini; next<next_end; next++){
-	ctr = ctr+1;
-	c2->cd(ctr);
+    ctr = ctr+1;
+    c2->cd(ctr);
     pValGraph[next] = new TGraph(n, xPeak, cociente); // Draw  cociente[npeak]=chisquare/ndf;
     pValGraph[next]->SetTitle(Form("ext%i",goodext[next]));
     pValGraph[next]->SetMinimum(0);
-    pValGraph[next]->SetMaximum(25);
+    pValGraph[next]->SetMaximum(20);
     pValGraph[next]->SetLineColor(4);
     pValGraph[next]->SetMarkerStyle(20); // Filled circle
     pValGraph[next]->SetMarkerSize(1.0);
@@ -626,7 +632,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
 
   }
 
-  c2->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/Chi_ndf.pdf"));
+  c2->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/Chi_ndf.pdf"));
   // ---------------------------------------------
   //plot Mean vs Peak
   printf("\nmean behavior across the peaks\n");
@@ -645,7 +651,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
     egraph[next]->SetTitle(Form("ext%i",goodext[next]));
     egraph[next]->Draw("AP"); 
   }
-  c3->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/mean.pdf"));
+  c3->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/mean.pdf"));
 
     // ---------------------------------------------
   //Plot gain vs Peak 2
@@ -680,7 +686,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
     egraph[next]->Draw("AP"); 
 
   }
-  c4->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/Gain_peaks.pdf"));
+  c4->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/Gain_peaks.pdf"));
 
   // ---------------------------------------------
   //Plot gain vs Peak 3
@@ -698,8 +704,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
     egraph[next]->SetTitle(Form("ext%i",goodext[next]));
     egraph[next]->SetMarkerStyle(8);
     egraph[next]->SetMarkerSize(0.5);
-    // egraph[next]->SetMinimum(210);
-    // egraph[next]->SetMaximum(280);
+
 
     ajusteLin[next]=new TF1("f", "[0]+[1]*x",0,numpeaks);  //Fit linear model
     ajusteLin[next]->SetParameters(200,0);
@@ -715,7 +720,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
     egraph[next]->Draw("AP"); 
 
   }
-  c5->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/Meanbypeak.pdf"));
+  c5->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/Meanbypeak.pdf"));
 
   // ---------------------------------------------
   //Plot gain vs Peak 4
@@ -727,14 +732,15 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
   printf("\n\n numpeaks= %i; iniPeak= %i;xpeak len= %f, n puntos=%i \n\n", numpeaks, iniPeak, sizeXpeak, n);
 
   for (int next=next_ini; next<next_end; next++){
-	ctr = ctr+1;
-	c6->cd(ctr);
+    ctr = ctr+1;
+    c6->cd(ctr);
     egraph[next] = new TGraphErrors(n, xPeak, peakGainDiv[next],exPeak, 0 ); // Grafica de cada extension
     egraph[next]->SetTitle(Form("ext%i",goodext[next]));
+
     egraph[next]->SetMarkerStyle(8);
     egraph[next]->SetMarkerSize(0.5);
-    // egraph[next]->SetMinimum(210);
-    // egraph[next]->SetMaximum(280);
+    // egraph[next]->SetMinimum(1);
+    // egraph[next]->SetMaximum(1.04);
 
     ajusteLin[next]=new TF1("f", "[0]+[1]*x",0,numpeaks);  //Fit linear model
     ajusteLin[next]->SetParameters(200,0);
@@ -750,7 +756,7 @@ void noisedcmm_3peaks_allChips (char const* file, char const* file2){
     egraph[next]->Draw("AP"); 
 
   }
-  c6->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/DesvFrac.pdf"));
+  c6->Print(Form("/home/oem/datosFits/DarkBeats/Brenda/pdfOutputs/DesvFrac.pdf"));
 
 }
     
