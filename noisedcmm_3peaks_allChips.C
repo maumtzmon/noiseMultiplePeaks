@@ -66,7 +66,7 @@ double multGaussians(double *x, double *par){
 //--------VARIABLES TO FIT HISTOGRAMS--------
                     //41 para probar solo con el pico 40y 41
 //const int numpeaks = 740;		// Number of peaks to fit starting from the 0e peak (numpeaks=2 fits the 0e and the 1e peak)
-const int numpeaks = 756;
+const int numpeaks = 5;
 double xPeak[numpeaks-1], exPeak[numpeaks-1]; 
 const int numext = 16;		// Number of working extensions
 double gainPeak[numext][numpeaks-1]; // ganancia medida entre picos  gainPeak[0] = peak2mean - peak1mean
