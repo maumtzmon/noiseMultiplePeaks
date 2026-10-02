@@ -215,7 +215,7 @@ double exp_gain[16];       // = {249.06, 183.66, 243.44, 240.54, 247.95, 239.42,
 double exp_lambda[16]  = {0.152,0.116,0.121,0.106,0.131,0.106,0.01,0.01,0.0144,0.083,0.094,0.0103,0.0157,0.0127,0.107,0.119};
 
 double fitrange, offsetaux, chisquare[numext][numpeaks-1], cociente[numext][numpeaks-1];
-
+char path[1000]="/home/oem/datosFits/DarkBeats/Brenda/outputs_noisemultipeaks/ANSAMP_300_01APR25/";
 int Gain_OK[16];
 
 //--------FUNCTIONS--------
@@ -266,6 +266,7 @@ void noisedcmm_TSpectrum(char const* file){
 
   int length = strlen(file);
   char fileroot[length+1]; //
+  
   strcpy(fileroot, file);		// Copy the input string to fileroot
   fileroot[length-5] = '\0';		// Throw ".root" from filename (last 5 characters)
 
@@ -376,14 +377,14 @@ void noisedcmm_TSpectrum(char const* file){
       gPad->SetLogy();
       hpix[next]->GetXaxis()->SetRangeUser(-exp_gain[next], maxq);//numpeaks*250); // Cambia estos valores al rango que quieras mostrar
       hpix[next]->Draw("hist");
-      // c1->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP500/C1_espectro/%s_ext%i_hist.png", fileroot, next));
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C1_espectro", fileroot);
+      // c1->SaveAs(Form("%s/MCM15_ANSAMP500/C1_espectro/%s_ext%i_hist.png", fileroot, next));
+      dirPath=Form("%s/%s/C1_espectro", path,fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      c1->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C1_espectro/%s_ext%i_hist.png", fileroot, fileroot, next));
-      printf("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C1_espectro/%s_ext%i_hist.png\n", fileroot, fileroot, next);
+      c1->SaveAs(Form("%s/%s/C1_espectro/%s_ext%i_hist.png",path, fileroot, fileroot, next));
+      printf("%s/%s/C1_espectro/%s_ext%i_hist.png\n", path, fileroot, fileroot, next);
       c1->Update();
 
       //histograma en un Double_t para usar el metodo Background de TSpectrum
@@ -438,14 +439,14 @@ void noisedcmm_TSpectrum(char const* file){
       // hpix[next]->Draw("hist");
       d4->Draw("same");
       
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C2_fondo_Tspectrum", fileroot);
+      dirPath=Form("%s/%s/C2_fondo_Tspectrum", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      // c2->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300/C2_fondo_Tspectrum/%s_ext%i_hist_fondo.png", fileroot, next));
-      c2->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C2_fondo_Tspectrum/%s_ext%i_hist_fondo.png", fileroot, fileroot, next));
-      printf("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C2_fondo_Tspectrum/%s_ext%i_hist_fondo.png\n", fileroot, fileroot, next);
+      // c2->SaveAs(Form("%s/MCM15_ANSAMP300/C2_fondo_Tspectrum/%s_ext%i_hist_fondo.png", fileroot, next));
+      c2->SaveAs(Form("%s/%s/C2_fondo_Tspectrum/%s_ext%i_hist_fondo.png", path, fileroot, fileroot, next));
+      printf("%s/%s/C2_fondo_Tspectrum/%s_ext%i_hist_fondo.png\n", path, fileroot, fileroot, next);
       
       c2->Update();
       // ---------------------------------------------
@@ -462,14 +463,14 @@ void noisedcmm_TSpectrum(char const* file){
       gPad->SetLogy();
       hist_noBkgd->Draw();
       
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C3_Bkgd_substracted", fileroot);
+      dirPath=Form("%s/%s/C3_Bkgd_substracted", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      // c3->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300/C3_Bkgd_substracted/%s_ext%i_hist_nobkgd.png", fileroot, next));
-      c3->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C3_Bkgd_substracted/%s_ext%i_hist_nobkgd.png", fileroot, fileroot, next));
-      printf("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C3_Bkgd_substracted/%s_ext%i_hist_nobkgd.png\n", fileroot, fileroot, next);
+      // c3->SaveAs(Form("%s/MCM15_ANSAMP300/C3_Bkgd_substracted/%s_ext%i_hist_nobkgd.png", fileroot, next));
+      c3->SaveAs(Form("%s/%s/C3_Bkgd_substracted/%s_ext%i_hist_nobkgd.png", path, fileroot, fileroot, next));
+      printf("%s/%s/C3_Bkgd_substracted/%s_ext%i_hist_nobkgd.png\n", path, fileroot, fileroot, next);
       c3->Update();
 
 
@@ -678,15 +679,15 @@ void noisedcmm_TSpectrum(char const* file){
 
       }
 
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C4_Fit_2gauss", fileroot);
+      dirPath=Form("%s/%s/C4_Fit_2gauss", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
 
       c4->Update();
-      // c4->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300_hepeaks/C4_Fit_2gauss/%s_ext%i_hist_fits.png", fileroot, next));
-      c4->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C4_Fit_2gauss/%s_ext%i_hist_fits.png", fileroot, fileroot, next)); 
+      // c4->SaveAs(Form("%s/MCM15_ANSAMP300_hepeaks/C4_Fit_2gauss/%s_ext%i_hist_fits.png", fileroot, next));
+      c4->SaveAs(Form("%s/%s/C4_Fit_2gauss/%s_ext%i_hist_fits.png", path, fileroot, fileroot, next)); 
       printf("./%s_ext%i_hist.png\n", fileroot, next);
 
       // ---------------------------------------------
@@ -791,13 +792,13 @@ void noisedcmm_TSpectrum(char const* file){
         TLegend *legend_c5 = new TLegend(0.6,0.7,0.9,0.9);
         legend_c5->Draw();
       }
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C5_Fit_poisson", fileroot);
+      dirPath=Form("%s/%s/C5_Fit_poisson", path,fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      //c5->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM45 _ANSAMP500_hepeaks/C5_Fit_poisson/%s_ext%i_hist_poissonFit.png", fileroot, next));
-      c5->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C5_Fit_poisson/%s_ext%i_hist_poissonFit.png", fileroot, fileroot, next));
+      //c5->SaveAs(Form("%s/MCM45 _ANSAMP500_hepeaks/C5_Fit_poisson/%s_ext%i_hist_poissonFit.png", fileroot, next));
+      c5->SaveAs(Form("%s/%s/C5_Fit_poisson/%s_ext%i_hist_poissonFit.png", path, fileroot, fileroot, next));
       printf("./%s_ext%i_hist_poissonFit.png\n", fileroot, next);
       c5->Update();
 
@@ -821,13 +822,13 @@ void noisedcmm_TSpectrum(char const* file){
       g_gain->GetYaxis()->SetRangeUser(xpeaks_sorted[1]-15,xpeaks_sorted[1]+15);
       g_gain->Draw("AP");
       printf("./%s_ext%i_hist_poissonFit.png\n", fileroot, next);
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C6_gainTspectrum", fileroot);
+      dirPath=Form("%s/%s/C6_gainTspectrum", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      //c6->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300_hepeaks/C6_gainTspectrum/%s_ext%i_xpeak_Peak_num.png", fileroot, next));
-      c6->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C6_gainTspectrum/%s_ext%i_xpeak_Peak_num.png", fileroot, fileroot, next));
+      //c6->SaveAs(Form("%s/MCM15_ANSAMP300_hepeaks/C6_gainTspectrum/%s_ext%i_xpeak_Peak_num.png", fileroot, next));
+      c6->SaveAs(Form("%s/%s/C6_gainTspectrum/%s_ext%i_xpeak_Peak_num.png", path, fileroot, fileroot, next));
       c6->Update();
 
       // ---------------------------------------------
@@ -862,14 +863,14 @@ void noisedcmm_TSpectrum(char const* file){
       tex->DrawLatex(0.15, 0.85, Form("Pendiente = %.4f +- %.4f", pendiente[next], error_pendiente[next]));
 
 
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C7_gainFit", fileroot);
+      dirPath=Form("%s/%s/C7_gainFit", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
 
-      //c7->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300_hepeaks/C7_gainFit/%s__ext%i_xpeakFit_Peak_num.png", fileroot, next));
-      c7->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C7_gainFit/%s__ext%i_xpeakFit_Peak_num.png", fileroot, fileroot, next));
+      //c7->SaveAs(Form("%s/MCM15_ANSAMP300_hepeaks/C7_gainFit/%s__ext%i_xpeakFit_Peak_num.png", fileroot, next));
+      c7->SaveAs(Form("%s/%s/C7_gainFit/%s__ext%i_xpeakFit_Peak_num.png", path, fileroot, fileroot, next));
       c7->Update();
 
 
@@ -892,13 +893,13 @@ void noisedcmm_TSpectrum(char const* file){
       g_sigma->GetXaxis()->SetRangeUser(0, peak2measure-1);
       //  g_sigma->GetYaxis()->SetRangeUser(0, 100);
       g_sigma->Draw("AP");
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C8_sigmaFit", fileroot);
+      dirPath=Form("%s/%s/C8_sigmaFit", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      // c8->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300_hepeaks/C8_sigmaFit/%s__ext%i_sigmaFit_Peak.png", fileroot, next));
-      c8->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C8_sigmaFit/%s__ext%i_sigmaFit_Peak.png", fileroot, fileroot, next));
+      // c8->SaveAs(Form("%s/MCM15_ANSAMP300_hepeaks/C8_sigmaFit/%s__ext%i_sigmaFit_Peak.png", fileroot, next));
+      c8->SaveAs(Form("%s/%s/C8_sigmaFit/%s__ext%i_sigmaFit_Peak.png", path, fileroot, fileroot, next));
       c8->Update();
 
 
@@ -922,13 +923,13 @@ void noisedcmm_TSpectrum(char const* file){
       // g_chi->GetYaxis()->SetRangeUser(0, 100);
       g_chi->Draw("AP");
 
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C9_chiSquareFit", fileroot);
+      dirPath=Form("%s/%s/C9_chiSquareFit", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      // c9->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300_hepeaks/C9_chiSquareFit/%s__ext%i_chiSquareFit_Peak.png", fileroot, next));
-      c9->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C9_chiSquareFit/%s__ext%i_chiSquareFit_Peak.png", fileroot, fileroot, next));
+      // c9->SaveAs(Form("%s/MCM15_ANSAMP300_hepeaks/C9_chiSquareFit/%s__ext%i_chiSquareFit_Peak.png", fileroot, next));
+      c9->SaveAs(Form("%s/%s/C9_chiSquareFit/%s__ext%i_chiSquareFit_Peak.png", path, fileroot, fileroot, next));
       c9->Update();
 
       //----------------------------------------------
@@ -984,13 +985,13 @@ void noisedcmm_TSpectrum(char const* file){
       latex.SetNDC();
       latex.DrawLatex(0.15,0.85,
       Form("Gain = %.3f" , gainnnn)    );
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C10_gainFit", fileroot);
+      dirPath=Form("%s/%s/C10_gainFit", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
-      // c10->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300_hepeaks/C10_gainFit/%s__ext%i_xpeakFit_Peak_num.png", fileroot, next));
-      c10->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C10_gainFit/%s__ext%i_xpeakFit_Peak_num.png", fileroot, fileroot, next));
+      // c10->SaveAs(Form("%s/MCM15_ANSAMP300_hepeaks/C10_gainFit/%s__ext%i_xpeakFit_Peak_num.png", fileroot, next));
+      c10->SaveAs(Form("%s/%s/C10_gainFit/%s__ext%i_xpeakFit_Peak_num.png", path, fileroot, fileroot, next));
       c10->Update();
 
 
@@ -1035,14 +1036,14 @@ void noisedcmm_TSpectrum(char const* file){
       latex2.SetNDC();
       latex2.DrawLatex(0.15,0.85,
       Form("Gain = %.3f#pm %.3f" , gainnnn2,egain2));
-      dirPath=Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C11_gainFit", fileroot);
+      dirPath=Form("%s/%s/C11_gainFit", path, fileroot);
       if (gSystem->AccessPathName(dirPath)) {
         std::cout << "El directorio no existe. Creándolo..." << std::endl;
         gSystem->MakeDirectory(dirPath);
       }
       
-      // c11->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/MCM15_ANSAMP300/C11_gainFit/%s_ext%i_hist.png", fileroot, next));
-      c11->SaveAs(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/C11_gainFit/%s_ext%i_hist.png", fileroot, fileroot, next));
+      // c11->SaveAs(Form("%s/MCM15_ANSAMP300/C11_gainFit/%s_ext%i_hist.png", fileroot, next));
+      c11->SaveAs(Form("%s/%s/C11_gainFit/%s_ext%i_hist.png", path, fileroot, fileroot, next));
       c11->Update();
 
 
@@ -1061,7 +1062,7 @@ TString ts = fileroot;
 sscanf(ts.Data(),"MCM%[0-9A-Z]_ANSAMP%d", mcmID, &anSamp);
   
 
-  std::ofstream gain_stream(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/%s_gainMethods.tsv", fileroot, fileroot));
+  std::ofstream gain_stream(Form("%s/%s/%s_gainMethods.tsv", path, fileroot, fileroot));
 
   // std::stringstream gain_stream;
 
@@ -1098,7 +1099,7 @@ sscanf(ts.Data(),"MCM%[0-9A-Z]_ANSAMP%d", mcmID, &anSamp);
 
 
 // Crear y abrir el archivo TSV
-std::ofstream archivoSalida(Form("/home/darkbeats/DB_scripts/Calibration/outputs_noisemultipeaks/ANSAMP_300_01APR25/%s/%s_allParameters.tsv", fileroot, fileroot));
+std::ofstream archivoSalida(Form("%s/%s/%s_allParameters.tsv", path, fileroot, fileroot));
 if (!archivoSalida.is_open()) {
     std::cerr << "Error: No se pudo abrir el archivo" << std::endl;
     
